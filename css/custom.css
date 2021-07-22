@@ -1,0 +1,174 @@
+@font-face{
+    font-family:'Candyhome' ;  /* 字体名自定义即可 */
+    src:url('/fonts/Candy.ttf'); /* 字体文件路径 */
+    font-display : swap;
+  }
+  
+h1#site-title {
+  font-family: 'Candyhome', sans-serif;
+  }
+
+span#subtitle {
+    font-family:'Candyhome'!important
+}
+a#site-name {
+    font-family:'Candyhome'!important
+}
+
+  #footer {
+    background: rgba(255,255,255,.15);
+    color: #000;
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    backdrop-filter: saturate(100%) blur(5px)
+}
+
+#footer::before {
+    background: rgba(255,255,255,.15)
+}
+
+#footer #footer-wrap {
+    color: var(--font-color)
+}
+
+#footer #footer-wrap a {
+    color: var(--font-color)
+}
+
+/*iconfont默认样式*/
+.icon {
+  width: 1em; height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+  }
+/* 页脚蝴蝶振翅动画 */
+.copyright svg{
+  animation:butterfly 1s linear infinite alternate;
+}
+@keyframes butterfly {
+  from {
+    transform:rotateY(70deg);
+  }
+  to {
+    transform:rotateY(0deg);
+  }
+}
+
+svg.icon {
+  width: 1em; height: 1em;
+  /* width和height定义图标的默认宽度和高度*/
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+/* 页脚透明 */
+#footer{
+  background: transparent!important;
+}
+    
+/* 全局默认鼠标指针 */
+body,
+html{
+  cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/arrow.cur'),auto !important;
+}
+/* 悬停图片时的鼠标指针 */
+img{
+  cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/btn.cur'),auto !important;
+}
+/* 选择链接标签时的鼠标指针 */
+a:hover{
+    cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/link.cur'),auto;
+}
+/* 选中输入框时的鼠标指针 */
+input:hover{
+    cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/input.cur'),auto;
+}
+/* 悬停按钮时的鼠标指针 */
+button:hover{
+    cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/btn.cur'),auto;
+}
+/* 悬停列表标签时的鼠标指针 */
+i:hover{
+    cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/link.cur'),auto;
+}
+/* 悬停页脚链接标签（例如页脚徽标）时的鼠标指针 */
+#footer-wrap a:hover{
+      cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/hf.cur'),auto;
+}
+/* 悬停页码时的鼠标指针 */
+#pagination .page-number:hover{
+      cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/i.cur'),auto;
+}
+/* 悬停菜单栏时的鼠标指针 */
+#nav .site-page:hover{
+      cursor: url('https://cdn.jsdelivr.net/npm/akilar-candyassets/cur/hf.cur'),auto;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 2em;
+  /* background-color: rgba(73, 177, 245, .2); */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / .3);
+  background-image: -webkit-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 75%, transparent);
+  border-radius: 2em
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent
+}
+
+@import "//at.alicdn.com/t/font_2264842_3izu8i5eoc2.css";
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 3em;
+  /* 可以定义图标大小 */
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  }
+  .icon-rat:before {
+    color: #85c3de;
+  }
+  .icon-ox:before {
+    color: #ffaf6e;
+  }
+  .icon-tiger:before {
+    color: #f7c768;
+  }
+  .icon-rabbit:before {
+    color: #ffbdd8;
+  }
+  .icon-dragon:before {
+    color: #ff8787;
+  }
+  .icon-snake:before {
+    color: #c3d686;
+  }
+  .icon-horse:before {
+    color: #ffaf6e;
+  }
+  .icon-goat:before {
+    color: #f7c768;
+  }
+  .icon-monkey:before {
+    color: #c3d686;
+  }
+  .icon-rooster:before {
+    color: #ff8787;
+  }
+  .icon-dog:before {
+    color: #85c3de;
+  }
+  .icon-boar:before {
+    color: #ffbdd8;
+  }

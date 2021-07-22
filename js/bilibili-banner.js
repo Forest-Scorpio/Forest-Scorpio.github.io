@@ -1,41 +1,110 @@
-//autumn_banner
-
-var autumnBanner = document.querySelector('#autumnBanner')
-if (autumnBanner) {
-  var images = document.querySelectorAll('#autumnBanner > div > img')
-  autumnBanner.addEventListener('mousemove', (e) => {
-    let percentage = e.clientX / window.outerWidth
-    let offset = 10 * percentage
-    let blur = 20
-
-    for (let [index, image] of images.entries()) {
-      offset *= 1.3
-
-      let blurValue = (Math.pow((index / images.length - percentage), 2) * blur)
-
-      image.style.setProperty('--offset', `${offset}px`)
-      image.style.setProperty('--blur', `${blurValue}px`)
-    }
-  })
+/* autumnBanner */
+@media screen and (max-width: 1000px) {
+  #autumnBanner {
+    display: none !important;
+  }
 }
-//winter_banner
+#autumnBanner {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  filter: brightness(70%);
+}
 
-var winterBanner = document.querySelector('#winterBanner')
-if (winterBanner) {
-  var startingPoint
-  winterBanner.addEventListener('mouseenter', (e) => {
-    startingPoint = e.clientX
-    winterBanner.classList.add('moving')
-  })
+#autumnBanner > div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-  winterBanner.addEventListener('mouseout', (e) => {
-    winterBanner.classList.remove('moving')
-    winterBanner.style.setProperty('--percentage', 0.5)
-  })
+  --offset: 0px;
+  --blur: 2px;
+}
 
-  winterBanner.addEventListener('mousemove', (e) => {
-    let percentage = (e.clientX - startingPoint) / window.outerWidth + 0.5
+#autumnBanner > div > img {
+  display: block;
+  width: 110%;
+  height: 100%;
+  object-fit: cover;
 
-    winterBanner.style.setProperty('--percentage', percentage)
-  })
+  transform: translatex(var(--offset));
+  filter: blur(var(--blur));
+}
+
+/* winterBanner */
+@media screen and (max-width: 1000px) {
+  #winterBanner {
+    display: none !important;
+  }
+}
+
+#winterBanner {
+  height: 100%;
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  --percentage: 0.5;
+}
+
+#winterBanner .view, #winterBanner .tree {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#winterBanner img, #winterBanner video {
+  position: absolute;
+  display: block;
+  max-width: 120% !important;
+  width: 120% !important;
+  ;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(70%);
+}
+
+#winterBanner .morning {
+  z-index: 20;
+  opacity: calc(1 - (var(--percentage) - 0.25) / 0.25);
+}
+
+#winterBanner .afternoon {
+  z-index: 10;
+  opacity: calc(1 - (var(--percentage) - 0.5) / 0.5);
+}
+
+#winterBanner .view {
+  transform: translatex(calc(var(--percentage) * 100px));
+}
+
+#winterBanner .tree {
+  transform: translatex(calc(var(--percentage) * 50px));
+  filter: blur(3px);
+}
+
+#winterBanner .view,
+#winterBanner .tree,
+#winterBanner .morning,
+#winterBanner .afternoon {
+  transition: .2s all ease-in;
+}
+
+#winterBanner.moving .view,
+#winterBanner.moving .tree,
+#winterBanner.moving .morning,
+#winterBanner.moving .afternoon {
+  transition: none;
+}
+
+#winterBanner .window-cover {
+  opacity: calc((var(--percentage) - 0.9) / 0.1);
 }
