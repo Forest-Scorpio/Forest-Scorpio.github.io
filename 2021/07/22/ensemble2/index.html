@@ -1,0 +1,385 @@
+<!DOCTYPE html><html lang="zh_CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>集成学习【二】 | 森森然的部落格</title><meta name="keywords" content="随机森林,GBDT,XGBoost,LightGBM"><meta name="author" content="SeekingBlue"><meta name="copyright" content="SeekingBlue"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="随机森林  随机森林算法背后的思想是群体智慧的体现，它通过随机的 行采样 和 列采样 构造不同的训练集，建立一个决策树森林，利用加权平均方式或多数表决的方式得到最后的预测结果，能够并行学习，对噪声和异常数据具有很好的过滤作用，因此有很广泛的应用。  随机森林的 行采样 和 列采样 都是为了减小模型之间的相关性使基学习器变得不同从而减小集成模型的方差。这种随机性会导致随机森林的偏差有所增加（相比于单">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集成学习【二】">
+<meta property="og:url" content="http://example.com/2021/07/22/ensemble2/index.html">
+<meta property="og:site_name" content="森森然的部落格">
+<meta property="og:description" content="随机森林  随机森林算法背后的思想是群体智慧的体现，它通过随机的 行采样 和 列采样 构造不同的训练集，建立一个决策树森林，利用加权平均方式或多数表决的方式得到最后的预测结果，能够并行学习，对噪声和异常数据具有很好的过滤作用，因此有很广泛的应用。  随机森林的 行采样 和 列采样 都是为了减小模型之间的相关性使基学习器变得不同从而减小集成模型的方差。这种随机性会导致随机森林的偏差有所增加（相比于单">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1">
+<meta property="article:published_time" content="2021-07-22T14:00:00.000Z">
+<meta property="article:modified_time" content="2021-09-03T06:50:41.902Z">
+<meta property="article:author" content="SeekingBlue">
+<meta property="article:tag" content="随机森林">
+<meta property="article:tag" content="GBDT">
+<meta property="article:tag" content="XGBoost">
+<meta property="article:tag" content="LightGBM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1"><link rel="shortcut icon" href="/img/capricorn.png"><link rel="canonical" href="http://example.com/2021/07/22/ensemble2/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"search.xml","languages":{"hits_empty":"We didn't find any results for the search: ${query}"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '集成学习【二】',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: true,
+  isToc: true,
+  postUpdate: '2021-09-03 14:50:41'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"  media="defer" onload="this.media='all'"><link rel="stylesheet" href="/css/bilibiliBanner.css"  media="defer" onload="this.media='screen'"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-butterfly-clock/lib/clock.min.css"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="wizard-scene"><div class="wizard-objects"><div class="wizard-square"></div><div class="wizard-circle"></div><div class="wizard-triangle"></div></div><div class="wizard"><div class="wizard-body"></div><div class="wizard-right-arm"><div class="wizard-right-hand"></div></div><div class="wizard-left-arm"><div class="wizard-left-hand"></div></div><div class="wizard-head"><div class="wizard-beard"></div><div class="wizard-face"><div class="wizard-adds"></div></div><div class="wizard-hat"><div class="wizard-hat-of-the-hat"></div><div class="wizard-four-point-star --first"></div><div class="wizard-four-point-star --second"></div><div class="wizard-four-point-star --third"></div></div></div></div></div></div><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/tx.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">4</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">12</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1)"><nav id="nav"><span id="blog_name"><a id="site-name" onclick="btf.scrollToDest(0, 500)" data-title="欢迎光临森森然小屋，愿你有愉快的一天">集成学习【二】</a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> Search</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="javascript:void(0);"><i class="fa-fw fa fa-heartbeat"></i><span> 清单</span><i class="fas fa-chevron-down expand"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/Gallery/"><i class="fa-fw fas fa-images"></i><span> 照片</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 电影</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">集成学习【二】</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2021-07-22T14:00:00.000Z" title="Created 2021-07-22 22:00:00">2021-07-22</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2021-09-03T06:50:41.902Z" title="Updated 2021-09-03 14:50:41">2021-09-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">机器学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">Word count:</span><span class="word-count">3.8k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">Reading time:</span><span>13min</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="集成学习【二】"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="随机森林"><a href="#随机森林" class="headerlink" title="随机森林"></a>随机森林</h1><p><img src="https://miro.medium.com/max/1204/1*iWHiPjPv0yj3RKaw0pJ7hA.png" alt=""></p>
+<ol>
+<li><p>随机森林算法背后的思想是群体智慧的体现，它通过随机的 <code>行采样</code> 和 <code>列采样</code> 构造不同的训练集，建立一个决策树森林，利用加权平均方式或多数表决的方式得到最后的预测结果，能够并行学习，对噪声和异常数据具有很好的过滤作用，因此有很广泛的应用。</p>
+</li>
+<li><p>随机森林的 <code>行采样</code> 和 <code>列采样</code> 都是为了减小模型之间的相关性使基学习器变得不同从而减小集成模型的方差。这种随机性会导致随机森林的偏差有所增加（相比于单棵决策树），因此随机森林的单棵树都会采用很深的决策树，并不进行剪枝操作，以减小每棵树的偏差，这使得每一棵决策树就是一个精通于某一个窄领域的专家（因为我们从全部特征中选择部分来让每一棵决策树学习），这样在随机森林中就有了很多个精通不同领域的专家，对一个新的问题（新的输入数据），可以用不同的角度去看待它，最终再通过投票或平均得到结果。这也正是群体智慧的体现。</p>
+</li>
+<li><p>随机森林是 <code>Bagging</code> 的一种扩展变体，与 <code>Bagging</code> 相比：</p>
+<ul>
+<li><p><code>Bagging</code> 中基学习器的 <code>多样性</code> 来自于样本扰动。&gt; 样本扰动来自于对初始训练集的随机采样。</p>
+</li>
+<li><p>随机森林中的基学习器的多样性不仅来自样本扰动，还来自属性扰动。</p>
+</li>
+<li><p>传统决策树在选择划分属性时，是在当前结点的属性集合（假定有 $n$ 个属性）中选择一个最优属性。</p>
+</li>
+<li><p>随机森林中，对基决策树的每个结点，先从该结点的属性集合中随机选择一个包含 $k$ 个属性的子集，然后再从这个子集中选择一个最优属性用于划分。（通常建议 $k=log_2n$）</p>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>这使得最终集成的泛化性能可以通过个体学习器之间差异度的增加而进一步提升。</strong></p>
+<ol>
+<li><code>Extra Tree</code></li>
+</ol>
+<p><code>Extra Tree</code>与<code>Random Forest</code>的十分相似，其主要区别如下：</p>
+<ul>
+<li><p><code>RF</code>会随机采样来作为子决策树的训练集，而<code>Extra Tree</code>每个子决策树采用原始数据集训练。</p>
+</li>
+<li><p><code>RF</code>在选择划分特征的阈值时会和传统决策树一样，基于信息增益、信息增益率、基尼系数、均方差等原则来选择最优&gt; 的<code>threshold</code>。<code>Extra Tree</code>则是随机选择<code>threshold</code>来划分决策树。</p>
+</li>
+</ul>
+<blockquote>
+<p>由于<code>Extra Tree</code>是随机选择特征点进行划分，所以最后得到的决策树规模会大于<code>RF</code>生成的决策树，<code>Extra Tree</code>决策树的偏差更大，但方差会减少，泛化能力比<code>RF</code>更强。</p>
+</blockquote>
+<h1 id="AdaBoost"><a href="#AdaBoost" class="headerlink" title="AdaBoost"></a>AdaBoost</h1><ol>
+<li><p><code>AdaBoost</code> 是基于 <code>Boosting</code> 的思想，通过多个弱分类器的线性组合来得到强分类器，训练时重点关注被错分的样本，准确率高的弱分类器权重大。</p>
+</li>
+<li><p>在训练过程中，它不改变所给的训练数据，而是不断改变训练数据权值的分布，使得被误分类的数据再后一轮的分类中受到更大的关注。</p>
+</li>
+<li><p>采用加权多数表决的方法，加大分类误差率小的弱分类器的权值，使其在最后的表决中起更大的作用，减小分类误差率大的弱分类器的权值，使其在最后的表决中起较小的作用。所有弱分类器的权值之和并不为 $1$，是通过最后结果的符号来决定实例的类别，该结果的绝对值表示分类的确信度。</p>
+</li>
+</ol>
+<center>
+<img src="./../img/adaboost1.png"> 
+</center>
+
+<center>
+<img src="./../img/adaboost1.png"> 
+</center>
+
+<blockquote>
+<p><code>Adaboost</code> 还有另外一种理解，即可以认为其模型是加法模型、损失函数为指数函数、学习算法为前向分步算法的二类分类学习方法。</p>
+<p>加法模型：多个基函数线性组合得到的模型</p>
+<p>前向分步算法：对于加法模型，从前往后，每一步只学习一个基函数及其系数，而不是一次性学习所有的基函数，从而简化优化的复杂度。</p>
+</blockquote>
+<h2 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h2><p>考虑如下形式的二分类训练集：</p>
+<script type="math/tex; mode=display">(x^{(1)}, y^{(1)}), (x^{(2)}, y^{(2)}), \dots, (x^{(N)}, y^{(N)})</script><p>其中 $x^{(i)}\in R^d$ 为第 $i$ 个样本的特征向量，$y^{(i)}\in -1, +1$</p>
+<p><code>AdaBoost</code>算法的步骤如下：</p>
+<ol>
+<li>初始化样本权重:</li>
+</ol>
+<script type="math/tex; mode=display">D_1=(w_{1,1}, w_{1,2}, \dots, w_{1,N}), w_{1,k}=\frac{1}{N},k=1,2,\dots,N</script><ol>
+<li><p>对 $m=1,2,\dots,M$，重复以下操作，得到 $M$ 个学习器：</p>
+<p> （1） 按照样本权重分布 $D_m$ 在训练集上得到第 $m$ 个基学习器 $G_m(x)$</p>
+<script type="math/tex; mode=display">G_m(x):map(R^d) ~ to ~ {-1, +1}</script><p> （2） 计算 $G_m(x)$ 在训练集上的加权分类误差率：</p>
+<script type="math/tex; mode=display">e_m=\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)}) \not= y^{(i)}) \tag{1}</script><p> （3） 计算 $G_m(x)$ 的系数：</p>
+<script type="math/tex; mode=display">\alpha_m=\frac{1}{2}log(\frac{1-e_m}{e_m}) \tag{2}</script><p> （4）更新样本权重 $D_{m+1}$:</p>
+<script type="math/tex; mode=display">D_{m+1}=(w_{m+1,1}, w_{m+1,2}, \dots, w_{m+1,N})</script><script type="math/tex; mode=display">w_{m+1,i}=\frac{w_{m,i}exp(-\alpha_my^{(i)}G_m(x^{(i)})}{Z_m} \tag{3}</script><p> 其中 $Z_m$ 为归一化因子：$Z_m=\sum_{i=1}^{N}w_{m,i}exp(-\alpha_my^{(i)}G_m(x^{(i)})$</p>
+</li>
+<li><p>构建最终的分类器的线性组合：</p>
+</li>
+</ol>
+<script type="math/tex; mode=display">f(x)=\sum_{m=1}^{M}\alpha_mG_m(x)\tag{4}</script><ol>
+<li>最终用于决策的分类器为：</li>
+</ol>
+<script type="math/tex; mode=display">G(x)=sign(f(x))=sign(\sum_{m=1}^{M}\alpha_mG_m(x)) \tag{5}</script><h2 id="AdaBoost算法的解释"><a href="#AdaBoost算法的解释" class="headerlink" title="AdaBoost算法的解释"></a><code>AdaBoost</code>算法的解释</h2><p>从理论上解释 <code>AdaBoost</code> 算法设置样本权重 $w_{m,i}$ 和分类器权重 $\alpha_m$ 的原因。</p>
+<h3 id="前向分步算法"><a href="#前向分步算法" class="headerlink" title="前向分步算法"></a>前向分步算法</h3><p><code>AdaBoost</code> 算法的最终模型的表达式为：</p>
+<script type="math/tex; mode=display">f(x)=\sum_{m=1}^{M}\alpha_mG_m(x)</script><p>可以看到，这是一个“加性模型”，我们希望这个模型在训练集上的经验误差最小，即：</p>
+<script type="math/tex; mode=display">min\sum_{i=1}^{N}\ell(y^{(i)},f(x^{(i)})) \tag{6}</script><p>通常这是一个复杂的优化问题。前向分步算法求解这一优化问题的基本思路为：如果从前往后，每一步只学习一个基学习器<br>$G_m(x)$ 及其权重$\alpha_m$，不断迭代得到最终的模型，那么我们可以简化问题的复杂度。</p>
+<p>具体的，当我们经过 $m-1$ 轮迭代得到最优模型 $f_{m-1}(x)$ 时，因为：</p>
+<script type="math/tex; mode=display">f_m(x)=f_{m-1}(x)+\alpha_mG_m(x)\tag{7}</script><p>此时，优化目标为：</p>
+<script type="math/tex; mode=display">min\sum_{i=1}^{N}\ell(y^{(i)},f_{m-1}(x^{(i)})+\alpha_mG_m(x^{(i)}))\tag{8}</script><h3 id="算法证明"><a href="#算法证明" class="headerlink" title="算法证明"></a>算法证明</h3><p>下面证明当损失函数为指数损失函数时，上述加性模型的学习步骤如上所示。</p>
+<p>指数损失函数：</p>
+<script type="math/tex; mode=display">\ell(y,f(x))=exp(-yf(x)) \tag{9}</script><blockquote>
+<p>可以证明，指数损失时分类任务0/1损失函数的一致替代损失函数。由于指数损失函数有更好的数学性质，例如处处可微，所以我们用它替代0/1损失作为优化目标。</p>
+</blockquote>
+<p>将损失函数代入 $(8)$ 式，则优化目标为：</p>
+<script type="math/tex; mode=display">\underset{\alpha_m,~G_m(x)}{argmin}\sum_{i=1}^{N}exp[-y^{(i)}(f_{m-1}(x^{(i)})+\alpha_mG_m(x^{(i)}))] \tag{10}</script><p>由于 $y^{(i)}f_{m-1}(x^{(i)})$ 与优化的变量无关，如果令：</p>
+<script type="math/tex; mode=display">w_{m,i}=exp(-y^{(i)}f_{m-1}(x^{(i)})) \tag{11}</script><p>则 $(10)$ 等价于：</p>
+<script type="math/tex; mode=display">\underset{\alpha_m,~G_m(x)}{argmin}\sum_{i=1}^{N}w_{m,i}exp(-y^{(i)}\alpha_mG_m(x^{(i)})) \tag{12}</script><blockquote>
+<p>这里的 $w_{m,i}$ 其实与算法是一致的。</p>
+</blockquote>
+<p>我们分两步来求解 $(12)$ 所示的优化问题的最优解 $\alpha_m$ 和 $G_m(x)$：</p>
+<ol>
+<li>$\forall \alpha_m \gt 0$ 求 $\hat{G_m(x)}$:</li>
+</ol>
+<script type="math/tex; mode=display">\hat{G_m(x)}=\underset{G_m(x)}{argmin}\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)})\not =y^{(i)}) \tag{13}</script><ol>
+<li>求解 $\hat{\alpha_m}$：</li>
+</ol>
+<script type="math/tex; mode=display">\begin{aligned}
+\sum_{i=1}^{N}w_{m,i}exp(-y^{(i)}\alpha_mG_m(x^{(i)}))&=exp(-\alpha_m)\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)})=y^{(i)}) \\
+&+ exp(\alpha_m)\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)})\not =y^{(i)}) \\
+&=[exp(\alpha_m)-exp(-\alpha_m)]\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)})\not =y^{(i)}) \\
+&+ exp(-\alpha_m)\sum_{i=1}^{N}w_{m,i}
+\end{aligned}</script><p>对上式关于 $\alpha_m$ 求导并令其为 $0$:</p>
+<script type="math/tex; mode=display">[exp(\alpha_m)+exp(-\alpha_m)]\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)})\not =y^{(i)})-exp(-\alpha_m)\sum_{i=1}^{N}w_{m,i}=0 \tag{15}</script><p>解得：</p>
+<script type="math/tex; mode=display">\hat{\alpha_m}=\frac{1}{2}log(\frac{1-e_m}{e_m}) \tag{16}</script><p>其中 $e_m$ 为加权误差率：</p>
+<script type="math/tex; mode=display">e_m=\frac{\sum_{i=1}^{N}w_{m,i}I(G_m(x^{(i)}) \not= y^{(i)})}{\sum_{i=1}^{N}w_{m,i}} \tag{17}</script><p>可见，只需将权重进行归一化，便得到 <code>AdaBoost</code> 算法中的加权误差率</p>
+<ol>
+<li>最后来看看每一轮样本权值的更新：</li>
+</ol>
+<script type="math/tex; mode=display">\begin{aligned}
+w_{m+1,i}=exp(-y^{(i)}f_m(x^{(i)}))&=exp(-y^{(i)}[f_{m-1}(x^{(i)})+\alpha_mG_m(x^{(i)})]) \\
+&=w_{m,i}exp(-y^{(i)}\alpha_mG_m(x^{(i)})) \end{aligned}</script><blockquote>
+<p>将权重进行归一化，便得到 <code>AdaBoost</code> 算法中的权重更新公式</p>
+</blockquote>
+<ol>
+<li>为防止过拟合，<code>AdaBoost</code> 通常会加入正则化项。该正则化项称作步长或者学习率，定义为 $\eta$，此时模型的更新为:</li>
+</ol>
+<script type="math/tex; mode=display">f_m(x)=f_{m-1}(x)+\eta\alpha_mG_m(x) \tag{19}</script><h1 id="GBDT"><a href="#GBDT" class="headerlink" title="GBDT"></a>GBDT</h1><p><code>GBDT</code> 是基于 <code>Boosting</code> 的思想，串行地构造多棵决策树来进行数据的预测，它是<strong>在损失函数所在的函数空间中做梯度下降，即把待求的决策树模型当作参数，每轮迭代都去拟合损失函数在当前模型下的负梯度</strong>，从而使得参数朝着最小化损失函数的方向更新。</p>
+<blockquote>
+<p><code>GBDT</code> 可以看作是 <code>AdaBoost</code> 的一个推广，<code>AdaBoost</code> 是通过错分数据点来识别问题，通过调整错分数据点的权重来改进模型，<code>GBDT</code> 是通过负梯度来识别问题，通过计算负梯度来改进模型，实际上，负梯度绝对值大的样例同样会在之后的训练中受到更大的关注，因为它造成的损失更容易在最后的损失函数中占很大的比重，因此，需要更多地偏向于它去减小损失。这也是 <code>GBDT</code> 和 <code>AdaBoost</code> 相似的一个点，而相比 <code>AdaBoost</code>, <code>Gradient Boosting</code> 可以使用更多类型的损失函数，因此可以解决更多的问题。</p>
+</blockquote>
+<h1 id="XGBoost"><a href="#XGBoost" class="headerlink" title="XGBoost"></a>XGBoost</h1><p><code>XGBoost</code>是梯度提升树的一种高效系统实现，是对 <code>GBDT</code> 进一步的改进，包括对代价函数进行了二阶泰勒展开，在代价函数里加入了正则项，借鉴了随机森林的列采样方法，支持并行计算等。</p>
+<ul>
+<li><p>传统 <code>GBDT</code> 在优化时只用到一阶导数信息，<code>XGBoost</code> 则对代价函数进行了二阶泰勒展开，同时用到了一阶和二阶导数。此外，<code>XGBoost</code> 工具支持自定义代价函数，只要函数可一阶和二阶求导。</p>
+</li>
+<li><p><code>XGBoost</code>在代价函数里加入了正则项，用于控制模型的复杂度。正则项里包含了树的叶子节点个数、每个叶子节点权重的 $L2$ 范数。从 <code>Bias-variance tradeoff</code> 角度来讲，正则项降低了模型的 <code>variance</code>，使学习出来的模型更加简单，防止过拟合，这也是 <code>XGBoost</code> 优于传统 <code>GBDT</code> 的一个特性。</p>
+</li>
+<li><p><code>Shrinkage</code>（缩减），相当于学习速率（<code>XGBoost</code> 中的<code>eta</code>）。<code>XGBoost</code> 在进行完一次迭代后，会将叶子节点的权重乘上该系数，主要是为了削弱每棵树的影响，让后面有更大的学习空间。实际应用中，一般把 <code>eta</code> 设置得小一点，然后迭代次数设置得大一点。</p>
+</li>
+<li><p>列抽样，<code>XGBoost</code> 借鉴了随机森林的做法，支持列抽样，不仅能降低过拟合，还能减少计算。</p>
+</li>
+<li><p>对缺失值的处理。对于特征的值有缺失的样本，<code>XGBoost</code> 可以自动学习出它的分裂方向。</p>
+</li>
+<li><p>支持并行。<code>XGBoost</code> 的并行不是树粒度的并行，<code>XGBoost</code> 也是一次迭代完才能进行下一次迭代的。<code>XGBoost</code> 的并行是在特征粒度上的。我们知道，决策树的学习最耗时的一个步骤就是对特征的值进行排序（因为要确定最佳分割点），<code>XGBoost</code> 在训练之前，预先对数据进行了排序，然后保存为 <code>Block</code> 结构，后面的迭代中重复地使用这个结构，大大减小计算量。这个 <code>Block</code> 结构也使得并行成为了可能，在进行节点的分裂时，需要计算每个特征的增益，最终选增益最大的那个特征去做分裂，那么各个特征的增益计算就可以开多线程进行。</p>
+</li>
+<li><p>可并行的近似直方图算法。树节点在进行分裂时，我们需要计算每个特征的每个分割点对应的增益，即用贪心法枚举所有可能的分割点。当数据无法一次载入内存或者在分布式情况下，贪心算法效率就会变得很低，所以 <code>XGBoost</code> 还提出了一种可并行的近似直方图算法，用于高效地生成候选的分割点。</p>
+</li>
+</ul>
+<h1 id="LightGBM"><a href="#LightGBM" class="headerlink" title="LightGBM"></a>LightGBM</h1><p><code>LightGBM</code> 是一个实现 <code>GBDT</code> 算法的分布式高效框架。它通过 <code>leaf-wise</code> 分裂方法进行决策树的生成，通过基于直方图的算法寻找特征分割点，并支持并行学习，能够更高效的处理大数据。</p>
+<p>要减少训练的复杂度，可以通过减少特征量和数据量来实现，即从行和列两个角度来减少数据，同时要尽可能少的影响最后的精度。在 <code>LightGBM</code> 中，就是这样做的，对应着 <code>GOSS</code> 和 <code>EFB</code>。</p>
+<ul>
+<li><p><code>Gradient-based One-Side Sampling (GOSS)</code>：<code>GBDT</code> 虽然没有数据权重，但每个数据实例有不同的梯度，根据计算信息增益的定义，梯度大的实例对信息增益有更大的影响，因此在下采样时，我们应该尽量保留梯度大的样本（预先设定阈值，或者最高百分位间），随机去掉梯度小的样本。此措施在相同的采样率下比随机采样获得更准确的结果，尤其是在信息增益范围较大时。</p>
+</li>
+<li><p><code>Exclusive Feature Bundling (EFB)</code>：通常在真实应用中，虽然特征量比较多，但是由于特征空间十分稀疏，许多特征几乎是互斥的，<code>EFB</code> 通过捆绑互斥的特征，并将捆绑问题归约到图着色问题，通过贪心算法求得近似解，以减少特征数量。</p>
+</li>
+<li><p>对于树的分裂方法，它通过 <code>leaf-wise</code> 分裂产生比 <code>level-wise</code> 分裂更复杂的树，能够实现更高的准确率。虽然这样有时候会导致过拟合，但可以通过设置 <code>max-depth</code> 参数来防止过拟合的发生。（每一次的生长都是选取分裂增益最高的节点，而不是对一层中的所有节点都进行分裂）。</p>
+</li>
+<li><p>其次，它使用基于直方图的算法，将连续的特征值分桶装进离散的箱子(<code>Bins</code>)，并通过直方图做差加速计算兄弟节点的直方图，能够加速训练过程，并实现更少的内存占用。</p>
+</li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="mailto:undefined">SeekingBlue</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://example.com/2021/07/22/ensemble2/">http://example.com/2021/07/22/ensemble2/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97/">随机森林</a><a class="post-meta__tags" href="/tags/GBDT/">GBDT</a><a class="post-meta__tags" href="/tags/XGBoost/">XGBoost</a><a class="post-meta__tags" href="/tags/LightGBM/">LightGBM</a></div><div class="post_share"><div class="social-share" data-image="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2021/08/31/text_classification1/"><img class="prev-cover" src="https://www.vennify.ai/content/images/size/w1140/2021/06/text-classification--1--1.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">文本分类的深度学习方法【一】</div></div></a></div><div class="next-post pull-right"><a href="/2021/07/20/ensemble1/"><img class="next-cover" src="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">集成学习【一】</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/tx.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">SeekingBlue</div><div class="author-info__description">记录分享学习和生活的点点滴滴，陪伴彼此共同成长</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">4</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">Tags</div><div class="length-num">12</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">Categories</div><div class="length-num">2</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/Forest-Scorpio" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="/1659821119@qq.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn card-announcement-animation"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97"><span class="toc-number">1.</span> <span class="toc-text">随机森林</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AdaBoost"><span class="toc-number">2.</span> <span class="toc-text">AdaBoost</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E6%AD%A5%E9%AA%A4"><span class="toc-number">2.1.</span> <span class="toc-text">算法步骤</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#AdaBoost%E7%AE%97%E6%B3%95%E7%9A%84%E8%A7%A3%E9%87%8A"><span class="toc-number">2.2.</span> <span class="toc-text">AdaBoost算法的解释</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%91%E5%88%86%E6%AD%A5%E7%AE%97%E6%B3%95"><span class="toc-number">2.2.1.</span> <span class="toc-text">前向分步算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E8%AF%81%E6%98%8E"><span class="toc-number">2.2.2.</span> <span class="toc-text">算法证明</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#GBDT"><span class="toc-number">3.</span> <span class="toc-text">GBDT</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#XGBoost"><span class="toc-number">4.</span> <span class="toc-text">XGBoost</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#LightGBM"><span class="toc-number">5.</span> <span class="toc-text">LightGBM</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2021/08/31/text_classification2/" title="文本分类的深度学习方法【二】"><img src="https://www.vennify.ai/content/images/size/w1140/2021/06/text-classification--1--1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文本分类的深度学习方法【二】"/></a><div class="content"><a class="title" href="/2021/08/31/text_classification2/" title="文本分类的深度学习方法【二】">文本分类的深度学习方法【二】</a><time datetime="2021-08-31T03:00:00.000Z" title="Created 2021-08-31 11:00:00">2021-08-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/08/31/text_classification1/" title="文本分类的深度学习方法【一】"><img src="https://www.vennify.ai/content/images/size/w1140/2021/06/text-classification--1--1.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="文本分类的深度学习方法【一】"/></a><div class="content"><a class="title" href="/2021/08/31/text_classification1/" title="文本分类的深度学习方法【一】">文本分类的深度学习方法【一】</a><time datetime="2021-08-31T02:00:00.000Z" title="Created 2021-08-31 10:00:00">2021-08-31</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/22/ensemble2/" title="集成学习【二】"><img src="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="集成学习【二】"/></a><div class="content"><a class="title" href="/2021/07/22/ensemble2/" title="集成学习【二】">集成学习【二】</a><time datetime="2021-07-22T14:00:00.000Z" title="Created 2021-07-22 22:00:00">2021-07-22</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2021/07/20/ensemble1/" title="集成学习【一】"><img src="https://mmbiz.qpic.cn/mmbiz_png/wc7YNPm3YxU95ztWMrZJ4Pib02XznYG2CpPguThhzugicQsGjILibBtytW7duL35EAVtrLKtkdkFspKibcdMsmvxaw/640?wx_fmt=jpeg&amp;tp=webp&amp;wxfrom=5&amp;wx_lazy=1&amp;wx_co=1" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="集成学习【一】"/></a><div class="content"><a class="title" href="/2021/07/20/ensemble1/" title="集成学习【一】">集成学习【一】</a><time datetime="2021-07-20T14:32:00.000Z" title="Created 2021-07-20 22:32:00">2021-07-20</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url(/img/bg2.jpg)"><div id="footer-wrap"><div class="copyright"><span>&copy;2020 - 2021</span><svg style="width:1.5em; height:1.5em" aria-hidden="true"><use xlink:href="#icon-Butterfly"></use></svg><span>SeekingBlue</span></div><div class="footer_custom_text">Grow into a complete and better me first</div><div id="workboard"></div><script async="async" src="/js/runtime.js"></script><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px"><img src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo"/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px"><img src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender"/></a><a class="github-badge" target="_blank" href="https://www.jsdelivr.com/" style="margin-inline:5px"><img src="https://img.shields.io/badge/CDN-jsDelivr-orange?style=flat&amp;logo=jsDelivr"/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px"><img src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub"/></a></p></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/HCLonely/images@master/others/heartbeat.min.css"></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="Toggle Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div id="local-search"><div class="search-dialog"><div class="search-dialog__title" id="local-search-title">Local search</div><div id="local-input-panel"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="Search for Posts" type="text"/></div></div></div><hr/><div id="local-search-results"></div><span class="search-close-button"><i class="fas fa-times"></i></span></div><div id="search-mask"></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/search/local-search.js"></script><div class="js-pjax"><script async="async">var preloader = {
+  endLoading: () => {
+    document.body.style.overflow = 'auto';
+    document.getElementById('loading-box').classList.add("loaded")
+  },
+  initLoading: () => {
+    document.body.style.overflow = '';
+    document.getElementById('loading-box').classList.remove("loaded")
+
+  }
+}
+window.addEventListener('load',()=> {preloader.endLoading()})
+setTimeout(function(){preloader.endLoading();}, 3000);</script></div><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.2
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container:not\([display]\)').forEach(node => {
+            const target = node.parentNode
+            if (target.nodeName.toLowerCase() === 'li') {
+              target.parentNode.classList.add('has-jax')
+            } else {
+              target.classList.add('has-jax')
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script></div><script async src="//at.alicdn.com/t/font_2032782_8ns648avijk.js"></script><script async src="//at.alicdn.com/t/font_2264842_3izu8i5eoc2.js"></script><script defer src="/live2d-widget/autoload.js"></script><script defer src="cursor.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div><!-- hexo injector body_end start --><script data-pjax>
+  function butterfly_clock_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src="/img/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_injector_config();
+  }
+  </script><script src="https://pv.sohu.com/cityjson?ie=utf-8"></script><script data-pjax src="https://cdn.jsdelivr.net/npm/hexo-butterfly-clock/lib/clock.min.js"></script><!-- hexo injector body_end end --></body></html>
